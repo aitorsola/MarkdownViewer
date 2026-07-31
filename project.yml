@@ -19,7 +19,7 @@ targets:
         NSHumanReadableCopyright: ""
         CFBundleDocumentTypes:
           - CFBundleTypeName: Markdown Document
-            CFBundleTypeRole: Viewer
+            CFBundleTypeRole: Editor
             LSHandlerRank: Owner
             LSItemContentTypes:
               - net.daringfireball.markdown

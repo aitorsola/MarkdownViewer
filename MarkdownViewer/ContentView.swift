@@ -3,13 +3,17 @@ import AppKit
 import UniformTypeIdentifiers
 
 struct ContentView: View {
-    private let parsed: ParsedMarkdown
+    @Binding var document: MarkdownDocument
     private let fileURL: URL?
+    @State private var parsed: ParsedMarkdown
+    @State private var isEditing = false
     @State private var selection: DocumentSection.ID?
+    @State private var parseTask: Task<Void, Never>?
 
-    init(document: MarkdownDocument, fileURL: URL? = nil) {
-        parsed = ParsedMarkdown.parse(document.text)
+    init(document: Binding<MarkdownDocument>, fileURL: URL? = nil) {
+        _document = document
         self.fileURL = fileURL
+        _parsed = State(initialValue: ParsedMarkdown.parse(document.wrappedValue.text))
     }
 
     var body: some View {
@@ -17,27 +21,22 @@ struct ContentView: View {
             sidebar
                 .navigationSplitViewColumnWidth(min: 180, ideal: 230, max: 400)
         } detail: {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(parsed.blocks) { block in
-                            MarkdownBlockView(block: block)
-                                .id(block.id)
-                        }
-                    }
-                    .frame(maxWidth: 760, alignment: .leading)
-                    .padding(28)
-                    .frame(maxWidth: .infinity)
-                }
-                .textSelection(.enabled)
-                .onChange(of: selection) { _, newValue in
-                    guard let newValue else { return }
-                    withAnimation {
-                        proxy.scrollTo(newValue, anchor: .top)
-                    }
+            Group {
+                if isEditing {
+                    editor
+                } else {
+                    preview
                 }
             }
             .toolbar {
+                ToolbarItem {
+                    Toggle(isOn: $isEditing.animation()) {
+                        Label("Editar", systemImage: "pencil")
+                    }
+                    .toggleStyle(.button)
+                    .help("Activar edición (⇧⌘E)")
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+                }
                 ToolbarItem {
                     Button(action: exportToPDF) {
                         Label("PDF", systemImage: "arrow.down.doc")
@@ -48,6 +47,53 @@ struct ContentView: View {
                 }
             }
         }
+        .onChange(of: document.text) { _, newText in
+            parseTask?.cancel()
+            parseTask = Task {
+                try? await Task.sleep(for: .milliseconds(250))
+                guard !Task.isCancelled else { return }
+                parsed = ParsedMarkdown.parse(newText)
+            }
+        }
+        .onChange(of: isEditing) { _, editing in
+            if !editing {
+                parseTask?.cancel()
+                parsed = ParsedMarkdown.parse(document.text)
+            }
+        }
+    }
+
+    private var preview: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(parsed.blocks) { block in
+                        MarkdownBlockView(block: block)
+                            .id(block.id)
+                    }
+                }
+                .frame(maxWidth: 760, alignment: .leading)
+                .padding(28)
+                .frame(maxWidth: .infinity)
+            }
+            .textSelection(.enabled)
+            .onChange(of: selection) { _, newValue in
+                guard let newValue else { return }
+                withAnimation {
+                    proxy.scrollTo(newValue, anchor: .top)
+                }
+            }
+        }
+    }
+
+    private var editor: some View {
+        TextEditor(text: $document.text)
+            .font(.system(.body, design: .monospaced))
+            .lineSpacing(3)
+            .autocorrectionDisabled()
+            .padding(12)
+            .scrollContentBackground(.hidden)
+            .background(Color(nsColor: .textBackgroundColor))
     }
 
     private func exportToPDF() {

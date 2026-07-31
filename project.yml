@@ -1,0 +1,49 @@
+name: MarkdownViewer
+options:
+  bundleIdPrefix: com.aitor
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+targets:
+  MarkdownViewer:
+    type: application
+    platform: macOS
+    sources:
+      - MarkdownViewer
+    info:
+      path: MarkdownViewer/Info.plist
+      properties:
+        CFBundleDisplayName: MarkdownViewer
+        CFBundleIconFile: AppIcon
+        LSApplicationCategoryType: public.app-category.productivity
+        NSHumanReadableCopyright: ""
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Markdown Document
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Owner
+            LSItemContentTypes:
+              - net.daringfireball.markdown
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: net.daringfireball.markdown
+            UTTypeDescription: Markdown Document
+            UTTypeConformsTo:
+              - public.plain-text
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - md
+                - markdown
+                - mdown
+                - mkdn
+                - mkd
+              public.mime-type:
+                - text/markdown
+    settings:
+      base:
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Developer ID Application: Aitor Sola (SK4CMEFH7T)"
+        DEVELOPMENT_TEAM: SK4CMEFH7T
+        ENABLE_HARDENED_RUNTIME: YES
+        OTHER_CODE_SIGN_FLAGS: "--timestamp"
+        SWIFT_VERSION: "5.0"

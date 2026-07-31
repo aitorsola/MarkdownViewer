@@ -1,0 +1,9 @@
+# Xcode (el .xcodeproj se genera con `xcodegen generate`)
+MarkdownViewer.xcodeproj/
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+
+# macOS
+.DS_Store

@@ -2,6 +2,8 @@
 
 Visor de Markdown para macOS. Se registra como aplicación para ficheros `.md`/`.markdown`, de modo que se abren con doble click o desde "Abrir con…".
 
+![MarkdownViewer mostrando docs/demo.md](docs/screenshot.png)
+
 ## Características
 
 - Sidebar con el índice de secciones del documento (encabezados); al seleccionar una, el contenido salta a ella.

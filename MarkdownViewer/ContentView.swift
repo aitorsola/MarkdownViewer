@@ -230,12 +230,12 @@ struct MarkdownTableView: View {
     }
 
     private func cell(_ text: AttributedString, column: Int) -> some View {
-        Text(text)
+        let alignment = alignments.indices.contains(column) ? alignments[column] : .leading
+        return Text(text)
             .padding(.vertical, 7)
             .padding(.horizontal, 12)
-            .gridColumnAlignment(
-                alignments.indices.contains(column) ? alignments[column].horizontal : .leading
-            )
+            .frame(maxWidth: .infinity, alignment: alignment.frameAlignment)
+            .gridColumnAlignment(alignment.horizontal)
     }
 }
 

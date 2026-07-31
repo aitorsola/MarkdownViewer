@@ -16,6 +16,14 @@ enum TableColumnAlignment {
         case .trailing: .trailing
         }
     }
+
+    var frameAlignment: Alignment {
+        switch self {
+        case .leading: .leading
+        case .center: .center
+        case .trailing: .trailing
+        }
+    }
 }
 
 enum MarkdownBlock: Identifiable {
